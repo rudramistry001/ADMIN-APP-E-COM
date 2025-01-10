@@ -1,7 +1,6 @@
 import 'package:admin_app/4%20view%20model/register_view_model.dart';
 import 'package:http_interceptor/http_interceptor.dart';
 
-
 class AuthInterceptor implements InterceptorContract {
   @override
   Future<BaseRequest> interceptRequest({required BaseRequest request}) async {
@@ -10,7 +9,7 @@ class AuthInterceptor implements InterceptorContract {
       RegisterViewModel registerViewModel = RegisterViewModel();
       request.headers['Content-Type'] = 'application/json';
       request.headers['Authorization'] =
-          'Bearer ${await registerViewModel.getUserAccessToken()}';
+          'Bearer ${await registerViewModel.getAccessToken()}';
       // request.headers['Authorization'] = 'Bearer $authToken';
     } catch (e) {
       throw e.toString();

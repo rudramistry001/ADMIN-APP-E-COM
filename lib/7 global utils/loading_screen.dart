@@ -1,66 +1,132 @@
 import 'package:admin_app/5%20screens/auth/login_screen.dart';
 import 'package:admin_app/5%20screens/dashboard/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
 
-class LoadingScreen extends StatefulWidget {
-  final Future<void> loginProcess;
-  const LoadingScreen({super.key, required this.loginProcess});
+class InitialLoadingScreen extends StatefulWidget {
+  const InitialLoadingScreen({Key? key}) : super(key: key);
 
   @override
-  _LoadingScreenState createState() => _LoadingScreenState();
+  InitialLoadingScreenState createState() => InitialLoadingScreenState();
 }
 
-class _LoadingScreenState extends State<LoadingScreen> {
+class InitialLoadingScreenState extends State<InitialLoadingScreen> {
   @override
   void initState() {
     super.initState();
-    _startLoginProcess();
+    _checkTokenAndNavigate();
   }
 
-  // This function starts the login process and waits for it to complete
-  void _startLoginProcess() async {
-    try {
-      // Wait for the login process to complete
-      await widget.loginProcess;
+  Future<void> _checkTokenAndNavigate() async {
+    final registerViewModel =
+        Provider.of<RegisterViewModel>(context, listen: false);
+    final isValid = await registerViewModel.verifyTokenAndNavigate(context);
 
-      // Delay to allow the loading animation to complete
-      await Future.delayed(const Duration(seconds: 3));
-
-      // If the login process was successful, navigate to the HomeScreen
-      if (!mounted) {
-        return; // Check if the widget is still mounted before navigating
+    if (mounted) {
+      if (isValid) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
       }
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => HomeScreen()),
-      );
-    } catch (e) {
-      await Future.delayed(const Duration(seconds: 3));
-
-      // If there's an error (e.g., failed login), navigate back to the LoginScreen
-      if (!mounted) {
-        return; // Check if the widget is still mounted before navigating
-      }
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Background color of the screen
+      backgroundColor: Colors.white, // Or your app's theme color
       body: Center(
-        child: LoadingAnimationWidget.inkDrop(
-          color: Colors.grey.shade800, // The color of the inkdrop animation
-          size: 100.sp, // Use ScreenUtil to make the size responsive
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // App Logo
+            Image.asset(
+              'assets/images/app_logo.png', // Replace with your logo path
+              width: 150,
+              height: 150,
+            ),
+            const SizedBox(height: 50),
+
+            // Loading Animation
+            LoadingAnimationWidget.staggeredDotsWave(
+              color: Colors.blue, // Use your app's primary color
+              size: 50,
+            ),
+
+            // Optional: You can try other animations like:
+            // LoadingAnimationWidget.inkDrop(
+            //   color: Colors.blue,
+            //   size: 50,
+            // ),
+
+            // LoadingAnimationWidget.twistingDots(
+            //   leftDotColor: Colors.blue,
+            //   rightDotColor: Colors.red,
+            //   size: 50,
+            // ),
+
+            // LoadingAnimationWidget.fourRotatingDots(
+            //   color: Colors.blue,
+            //   size: 50,
+            // ),
+
+            const SizedBox(height: 20),
+            const Text(
+              'Loading...',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.black54,
+              ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+// If you want a reusable loading widget:
+class CustomLoadingWidget extends StatelessWidget {
+  final Color color;
+  final double size;
+  final String? message;
+
+  const CustomLoadingWidget({
+    Key? key,
+    this.color = Colors.blue,
+    this.size = 50,
+    this.message,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        LoadingAnimationWidget.staggeredDotsWave(
+          color: color,
+          size: size,
+        ),
+        if (message != null) ...[
+          const SizedBox(height: 20),
+          Text(
+            message!,
+            style: TextStyle(
+              fontSize: size * 0.36,
+              fontWeight: FontWeight.w500,
+              color: Colors.black54,
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

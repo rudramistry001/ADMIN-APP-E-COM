@@ -95,18 +95,21 @@ class RegisterViewModel with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        final token = jsonResponse['token'];
+        final accessToken = jsonResponse['accessToken'];
+        final refreshToken = jsonResponse['refreshToken'];
         final id = jsonResponse['user']['id'];
         final fullname = jsonResponse['user']['fullname'];
+        final role = jsonResponse['user']['role'];
 
-        // Save the token and credentials if "Remember Me" is checked
+        // Save all credentials if "Remember Me" is checked
         if (rememberMe) {
-          await saveToken(token);
+          await saveAccessToken(accessToken);
+          await saveRefreshToken(refreshToken);
           await saveUserId(id);
-          await saveUserId(fullname);
+          await saveFullName(fullname);
+          await saveRole(role);
         }
 
-        // Successful login, return from the method
         return;
       } else {
         final jsonResponse = json.decode(response.body);
@@ -115,85 +118,80 @@ class RegisterViewModel with ChangeNotifier {
             customSnackBar(message: jsonResponse["error"]),
           );
         }
-
-        // If login fails, throw an exception
         throw Exception("Login failed");
       }
     } catch (e) {
-      // Handle login failure (e.g., network error)
       if (kDebugMode) {
         print("Exception at Logging in The User : $e");
       }
       snackBarKey.currentState?.showSnackBar(
         customSnackBar(message: "Exception at Logging in The User : $e"),
       );
-
-      // If an error occurs, throw to indicate failure
       throw Exception("Login failed");
     }
   }
 
-  Future<String> saveToken(String token) async {
+  // Updated and new storage functions
+  Future<String> saveAccessToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token', token);
-    print("TOKEN  SAVED _______");
-    print(token);
+    await prefs.setString('accessToken', token);
+    print("ACCESS TOKEN SAVED: $token");
     return token;
+  }
+
+  Future<String> saveRefreshToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('refreshToken', token);
+    print("REFRESH TOKEN SAVED: $token");
+    return token;
+  }
+
+  Future<String> saveRole(String role) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('role', role);
+    print("ROLE SAVED: $role");
+    return role;
   }
 
   Future<String> saveUserId(String id) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('id', id);
-    print("USER ID SAVED----------");
-    print(id);
+    print("ROLE SAVED: $id");
     return id;
   }
 
-  Future<String?> getUserAccessToken() async {
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    String? token = localStorage.getString('token');
-
-    return token;
+  Future<String> saveFullName(String fullname) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('fullname', fullname);
+    print("FULLNAME SAVED: $fullname");
+    return fullname;
   }
 
-  Future<String?> getUserId() async {
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    String? id = localStorage.getString('id');
-    print("USER ID IS GET USING SP");
-    print(id);
-
-    return id;
+  // Getter functions for stored values
+  Future<String?> getAccessToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('accessToken');
   }
 
-//   Future logoutUser(context) async {
-//     try {
-//       // // final localStorage = await SharedPreferences.getInstance();
-//       // await localStorage.clear();
-//       // String? token = localStorage.getString('token');
-//       // print("TOKEN _______");
-//       // print(token);
-//       // String? id = localStorage.getString('id');
-//       // print("USER ID----------");
-//       // print(id);
-//       // Optionally, you can also navigate the user back to the login screen
-//       // or perform any other necessary cleanup actions.
-//       // For example:
-//       Navigator.pushAndRemoveUntil(
-//           context,
-//           MaterialPageRoute(builder: (context) => const LoginScreen()),
-//           (route) => false);
-//     } catch (e) {
-//       // Handle any errors that might occur during logout process
-//       if (kDebugMode) {
-//         print("Exception at logging out the user: $e");
-//       }
-//       // You might want to notify the user or perform any other actions here
-//     }
-//   }
+  Future<String?> getRefreshToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('refreshToken');
+  }
 
+  Future<String?> getRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('role');
+  }
+
+  Future<String?> getFullName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('fullname');
+  }
+
+  // Updated logout function to clear all stored credentials
   Future<void> logoutUser(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Clear all saved data
+    await prefs.clear(); // This will clear all stored data
     print("ALL STORED CREDENTIALS DELETED");
     Navigator.pushAndRemoveUntil(
       context,

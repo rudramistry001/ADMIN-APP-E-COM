@@ -12,7 +12,7 @@ class RegisterModel {
     this.password,
     this.contactNumber,
     this.token,
-    this.role,
+    this.role = 'admin',
   });
 
   RegisterModel.fromJson(Map<String, dynamic> json) {
