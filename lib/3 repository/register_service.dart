@@ -1,5 +1,3 @@
-
-
 import 'package:admin_app/1%20model/auth_model.dart';
 import 'package:admin_app/2%20service/register_service.dart';
 
@@ -13,6 +11,11 @@ class RegisterRepository {
 
   Future loginUser(RegisterModel loginUser) async {
     final response = await registerServices.loginUser(loginUser);
+    return response;
+  }
+
+  Future verifytoken(RegisterModel verifytoken) async {
+    final response = await registerServices.verifytoken(verifytoken);
     return response;
   }
 }

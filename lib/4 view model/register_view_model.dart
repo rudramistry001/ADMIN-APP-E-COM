@@ -199,4 +199,54 @@ class RegisterViewModel with ChangeNotifier {
       (route) => false,
     );
   }
+
+  Future<bool> verifytoken(BuildContext context, RegisterModel register) async {
+    Loading loading = Loading(context);
+    try {
+      loading.startLoading();
+      print('verify token api called');
+
+      final response = await registerRepository.verifytoken(register);
+      final jsonResponse = json.decode(response.body);
+
+      // Always clear previous snackbars
+      snackBarKey.currentState?.clearSnackBars();
+
+      if (response.statusCode == 200) {
+        if (kDebugMode) {
+          print(
+              "Token Verification Successful - Status Code: ${response.statusCode}");
+        }
+
+        // Show success message if present
+        final message =
+            jsonResponse['message'] ?? 'Token verified successfully';
+        snackBarKey.currentState?.showSnackBar(
+          customSnackBar(message: message),
+        );
+
+        notifyListeners();
+        return true;
+      } else {
+        // Handle error responses
+        final errorMessage =
+            jsonResponse['error'] ?? 'Token verification failed';
+        snackBarKey.currentState?.showSnackBar(
+          customSnackBar(message: errorMessage),
+        );
+        return false;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Exception during token verification: $e");
+      }
+
+      snackBarKey.currentState?.showSnackBar(
+        customSnackBar(message: "Verification failed: ${e.toString()}"),
+      );
+      return false;
+    } finally {
+      loading.stopLoading(); // Always stop loading regardless of outcome
+    }
+  }
 }

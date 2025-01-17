@@ -27,12 +27,27 @@ class RegisterServices extends BaseApiProvider {
 
     try {
       final response = await postRequest(
-          Uri.parse(UrlConstant.uatUrl + UrlConstant.login), body);
+          Uri.parse(UrlConstant.baseUrl + UrlConstant.login), body);
       // You can handle the response here according to your requirements
       return response;
     } catch (e) {
       // Handle errors such as network issues or server errors
       print('Error in Logging in the user: $e');
+      rethrow; // Rethrow the error to be handled at the caller level if needed
+    }
+  }
+
+  Future<dynamic> verifytoken(RegisterModel verifytoken) async {
+    var body = verifytoken.toJson();
+
+    try {
+      final response = await postRequest(
+          Uri.parse(UrlConstant.baseUrl + UrlConstant.verifytoken), body);
+      // You can handle the response here according to your requirements
+      return response;
+    } catch (e) {
+      // Handle errors such as network issues or server errors
+      print('Error in verifying  the user: $e');
       rethrow; // Rethrow the error to be handled at the caller level if needed
     }
   }

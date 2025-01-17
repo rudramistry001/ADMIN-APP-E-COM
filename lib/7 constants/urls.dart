@@ -1,7 +1,3 @@
-
-
-
-
 import 'package:admin_app/7%20constants/base_url.dart';
 
 class UrlConstant {
@@ -14,4 +10,5 @@ class UrlConstant {
   static String register = "/register";
 
   static String login = "/login";
+  static String verifytoken = "/verify-token";
 }

@@ -1,7 +1,9 @@
-import 'package:admin_app/5%20screens/auth/login_screen.dart';
+import 'package:admin_app/4%20view%20model/register_view_model.dart';
+import 'package:admin_app/7%20global%20utils/initial_loading_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 // Global key to keep track of the navigator state.
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -15,9 +17,13 @@ void main() async {
     DeviceOrientation.portraitUp, // Portrait up mode
     DeviceOrientation.portraitDown, // Portrait down mode (optional)
   ]);
-// Check if token exists
   runApp(
-    MyApp(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => RegisterViewModel()),
+      ],
+      child: MyApp(),
+    ),
   );
 }
 
@@ -46,7 +52,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner:
                 false, // Disabling the debug banner on UI.
 
-            home: LoginScreen(),
+            home: InitialLoadingScreen(),
           );
         });
   }

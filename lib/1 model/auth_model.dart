@@ -3,7 +3,8 @@ class RegisterModel {
   String? email;
   String? password;
   String? contactNumber;
-  String? token;
+  String? accessToken;
+  String? refreshToken;
   String? role;
 
   RegisterModel({
@@ -11,7 +12,8 @@ class RegisterModel {
     this.email,
     this.password,
     this.contactNumber,
-    this.token,
+    this.accessToken,
+    this.refreshToken,
     this.role = 'admin',
   });
 
@@ -19,7 +21,8 @@ class RegisterModel {
     fullname = json['fullname'];
     email = json['email'];
     password = json['password'];
-    token = json['token'];
+    accessToken = json['accessToken'];
+    refreshToken = json['refreshToken'];
     contactNumber = json['contactno'];
     role = json['role'];
   }
@@ -30,7 +33,8 @@ class RegisterModel {
     data['email'] = email;
     data['password'] = password;
     data['contactno'] = contactNumber;
-    data['token'] = token;
+    data['accessToken'] = accessToken;
+    data['refreshToken'] = refreshToken;
     data['role'] = role;
 
     return data;
